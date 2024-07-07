@@ -2,7 +2,7 @@ package es.minsait.gom.controller;
 
 import java.util.Optional;
 
-import es.minsait.gom.model.Pessoa;
+import es.minsait.gom.model.Cliente;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -14,31 +14,31 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 
-@Path( "/pessoa" )
+@Path( "/cliente" )
 @Produces( MediaType.APPLICATION_JSON )
 @Consumes( MediaType.APPLICATION_JSON )
-public class PessoaController{
+public class ClienteController{
     
     @GET
     public Response listAll(){
         return Response.status( Response.Status.OK )
-            .entity( Pessoa.listAll() ).build();
+            .entity( Cliente.listAll() ).build();
     }
 
     @POST
     @Transactional
-    public Response create(final Pessoa pessoa){
-        pessoa.persist();
+    public Response create(final Cliente cliente){
+        cliente.persist();
         return Response.status( Response.Status.CREATED )
-            .entity( pessoa ).build();
+            .entity( cliente ).build();
     }
 
     @GET
     @Path( "/{id}" )
     public Response findById(final @PathParam( "id" ) Long id){
-        final Optional<Pessoa> pessoa = Pessoa.findByIdOptional( id );
-        if( pessoa.isPresent() )
-            return Response.status( Response.Status.OK ).entity( pessoa.get() ).build();
+        final Optional<Cliente> cliente = Cliente.findByIdOptional( id );
+        if( cliente.isPresent() )
+            return Response.status( Response.Status.OK ).entity( cliente.get() ).build();
         return Response.status( Response.Status.NOT_FOUND ).build();
     }
 
