@@ -3,7 +3,9 @@ package es.minsait.gom.controller;
 import static es.minsait.gom.util.Constantes.HTTP_STATUS_OK;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.slf4j.Logger;
@@ -18,6 +20,7 @@ import es.minsait.gom.json.PedidoResponse;
 import es.minsait.gom.model.Cliente;
 import es.minsait.gom.model.Loja;
 import es.minsait.gom.model.Pedido;
+import es.minsait.gom.model.StatusPedidoEnum;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -67,6 +70,10 @@ public class PedidoController{
                 return Response.status( Response.Status.BAD_REQUEST ).entity( msgValidacao )
                     .build();
             }
+            pedido.setDataPedido( LocalDate.now() );
+            pedido.setStatus( StatusPedidoEnum.ENVIANDO );
+            this.gerarUuidPedido( pedido );
+
             final Client client = ClientBuilder.newClient();
             final String jsonPedido = GSON.toJson( pedido );
             LOG.info( String.format( " >>>>>>>>>>> Pedido a ser realizado: \n%s", jsonPedido ) );
@@ -80,10 +87,12 @@ public class PedidoController{
             if( !HTTP_STATUS_OK.contains( pedidoResp.getStatus() ) ){
                 LOG.error( String.format( "Erro ao criar pedido na loja: '%s', URL: '%s', StatusCode: %d", 
                     pedido.getLoja().getNome(), pedido.getLoja().getUrlApi(), pedidoResp.getStatus() ) );
+                pedido.setStatus( StatusPedidoEnum.ERRO_ENVIO );
                 return Response.status( Response.Status.BAD_REQUEST )
                     .entity( "Erro ao criar pedido na loja" ).build();
             }else{
                 LOG.error( " >>> Passou!" );
+                ( (Pedido)pedidoResp.getEntity() ).setStatus( StatusPedidoEnum.ENVIADO );
                 return pedidoResp;
             }
         }catch( Exception e ){
@@ -171,6 +180,28 @@ public class PedidoController{
                 erros.append( "Loja não existe." );
             }
         }
+    }
+
+    private void gerarUuidPedido(Pedido pedido) {
+        final StringBuilder buffer = new StringBuilder( pedido.getLoja().getNome() )
+            .append( pedido.getLoja().getUrlApi() )
+
+            .append( pedido.getCliente().getPessoa().getId() )
+            .append( pedido.getCliente().getPessoa().getNome() )
+            .append( pedido.getCliente().getEmail() )
+
+            .append( pedido.getDataPedido()
+                .format( DateTimeFormatter.ofPattern( "yyyy-MM-dd" ) ) )
+            .append( pedido.getDescricao() )
+
+            .append( String.join( "|", pedido.getItensPedido().stream()
+                .map( item -> String.join( "|", 
+                    ( item.getNome() != null ? item.getNome() : "" ), 
+                    ( item.getQuantidade() != null ? item.getQuantidade().toString() : "0" ), 
+                    ( item.getPreco() != null ? item.getPreco().toString() : "0.0" ) ) )
+                .toList() )
+        );
+        pedido.setUuid( UUID.fromString( buffer.toString() ).toString() );
     }
 
     @Incoming( "pedido-responses" )

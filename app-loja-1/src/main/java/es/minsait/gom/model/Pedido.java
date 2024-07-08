@@ -11,18 +11,22 @@ public class Pedido{
     private LocalDate dataPedido;
     private String descricao;
     private List<ItemPedido> itensPedido;
+    private String uuid;
+    private StatusPedidoEnum status;
     
     public Pedido(){
         super();
     }
 
-    public Pedido(Cliente cliente, Loja loja, LocalDate dataPedido, String descricao, List<ItemPedido> itensPedido) {
+    public Pedido(String uuid, Cliente cliente, Loja loja, LocalDate dataPedido, String descricao, List<ItemPedido> itensPedido, StatusPedidoEnum status) {
         this();
+        this.uuid = uuid;
         this.cliente = cliente;
         this.loja = loja;
         this.dataPedido = dataPedido;
         this.descricao = descricao;
         this.itensPedido = itensPedido;
+        this.status = status;
     }
 
     public Cliente getCliente() {
@@ -63,6 +67,20 @@ public class Pedido{
 
     public void setItensPedido(List<ItemPedido> itensPedido) {
         this.itensPedido = itensPedido;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
+    public StatusPedidoEnum getStatus() {
+        return status;
+    }
+    public void setStatus(StatusPedidoEnum status) {
+        this.status = status;
     }
 
 }

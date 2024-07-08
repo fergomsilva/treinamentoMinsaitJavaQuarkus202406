@@ -3,17 +3,20 @@ package es.minsait.gom.model;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.transaction.Transactional;
 
 
 @Entity
 public class Pedido extends PanacheEntity{
     
+    private String uuid;
     @ManyToOne
     private Cliente cliente;
     @ManyToOne
@@ -22,22 +25,40 @@ public class Pedido extends PanacheEntity{
     private String descricao;
     @OneToMany( mappedBy="pedido", cascade=CascadeType.ALL, orphanRemoval=true )
     private List<ItemPedido> itensPedido;
+    private StatusPedidoEnum status;
     
-    public Pedido(){
-        super();
-    }
 
     public static List<Pedido> findByLojaId(final long idLoja){
         return Pedido.list( "from Pedido p where p.loja.id=?1", idLoja );
     }
 
-    public Pedido(Cliente cliente, Loja loja, LocalDate dataPedido, String descricao, List<ItemPedido> itensPedido) {
+    public static Optional<Pedido> findByUUID(final String uuid){
+        final List<Pedido> lista = Pedido.list( "from Pedido p where p.uuid=?1", uuid );
+        return lista.isEmpty() ? Optional.empty() : Optional.of( lista.get( 0 ) );
+    }
+
+    @Transactional
+    public static void updateStatus(final String uuid, final StatusPedidoEnum novoStatus){
+        final Optional<Pedido> pedido = Pedido.findByUUID( uuid );
+        if( pedido.isPresent() ){
+            pedido.get().setStatus( novoStatus );
+            Pedido.persist( pedido.get() );
+        }
+    }
+
+    public Pedido(){
+        super();
+    }
+
+    public Pedido(String uuid, Cliente cliente, Loja loja, LocalDate dataPedido, String descricao, List<ItemPedido> itensPedido, StatusPedidoEnum status) {
         this();
+        this.uuid = uuid;
         this.cliente = cliente;
         this.loja = loja;
         this.dataPedido = dataPedido;
         this.descricao = descricao;
         this.itensPedido = itensPedido;
+        this.status = status;
     }
 
     public Cliente getCliente() {
@@ -80,6 +101,20 @@ public class Pedido extends PanacheEntity{
 
     public void setItensPedido(List<ItemPedido> itensPedido) {
         this.itensPedido = itensPedido;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+
+    public StatusPedidoEnum getStatus() {
+        return status;
+    }
+    public void setStatus(StatusPedidoEnum status) {
+        this.status = status;
     }
 
 }

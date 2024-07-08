@@ -8,7 +8,7 @@ import jakarta.persistence.ManyToOne;
 public class ItemPedido extends PanacheEntity{
     
     private String nome;
-    private int quantidade;
+    private Integer quantidade;
     private Double preco;
     @ManyToOne
     private Pedido pedido;
@@ -17,7 +17,7 @@ public class ItemPedido extends PanacheEntity{
         super();
     }
 
-    public ItemPedido(String nome, int quantidade, Double preco, Pedido pedido) {
+    public ItemPedido(String nome, Integer quantidade, Double preco, Pedido pedido) {
         this.nome = nome;
         this.quantidade = quantidade;
         this.preco = preco;
@@ -32,11 +32,11 @@ public class ItemPedido extends PanacheEntity{
         this.nome = nome;
     }
 
-    public int getQuantidade() {
+    public Integer getQuantidade() {
         return quantidade;
     }
 
-    public void setQuantidade(int quantidade) {
+    public void setQuantidade(Integer quantidade) {
         this.quantidade = quantidade;
     }
 

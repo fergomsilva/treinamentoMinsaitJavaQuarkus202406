@@ -1,0 +1,18 @@
+--db.loja.save({nome:"Food 1",endereco:"Avenida Comercial, 123"})
+--INSERT INTO loja (nome, endereco) VALUES ('Food 1', 'Avenida Comercial, 123');
+--db.itens_cardapio.save({nome:"Hambúrguer Clássico",descricao:"Hambúrguer com queijo, alface, tomate e molho especial",preco:20.0})
+--INSERT INTO itens_cardapio (nome, descricao, preco) VALUES ('Hambúrguer Clássico', 'Hambúrguer com queijo, alface, tomate e molho especial', 20.00);
+--INSERT INTO itens_cardapio (nome, descricao, preco) VALUES ('Sanduíche de Frango', 'Frango grelhado com maionese e salada', 18.00);
+--INSERT INTO itens_cardapio (nome, descricao, preco) VALUES ('Batata Frita', 'Porção de batatas fritas crocantes', 10.00);
+--INSERT INTO itens_cardapio (nome, descricao, preco) VALUES ('Milkshake de Chocolate', 'Milkshake cremoso de chocolate', 12.00);
+--INSERT INTO itens_cardapio (nome, descricao, preco) VALUES ('Cachorro-Quente', 'Pão, salsicha, molho de tomate, milho, ervilha e batata palha', 15.00);
+--INSERT INTO itens_cardapio (nome, descricao, preco) VALUES ('Pizza Individual', 'Pizza individual com até 3 ingredientes à escolha', 25.00);
+--INSERT INTO itens_cardapio (nome, descricao, preco) VALUES ('Salada Caesar', 'Alface, croutons, queijo parmesão e molho Caesar', 18.00);
+--INSERT INTO itens_cardapio (nome, descricao, preco) VALUES ('Refrigerante', 'Lata de refrigerante de 350ml', 5.00);
+--INSERT INTO itens_cardapio (nome, descricao, preco) VALUES ('Suco Natural', 'Suco natural de frutas da estação', 8.00);
+--INSERT INTO itens_cardapio (nome, descricao, preco) VALUES ('Torrada Simples', 'Duas fatias de pão torrado com manteiga', 4.00);
+--INSERT INTO itens_cardapio (nome, descricao, preco) VALUES ('Pastel de Carne', 'Pastel frito com recheio de carne moída', 5.00);
+--INSERT INTO itens_cardapio (nome, descricao, preco) VALUES ('Coxinha de Frango', 'Salgadinho em formato de gota com recheio de frango', 4.50);
+--INSERT INTO itens_cardapio (nome, descricao, preco) VALUES ('Açaí na Tigela', 'Açaí servido na tigela com granola e banana', 14.00);
+--INSERT INTO itens_cardapio (nome, descricao, preco) VALUES ('Pão de Queijo', 'Delicioso pão de queijo mineiro', 3.50);
+--INSERT INTO itens_cardapio (nome, descricao, preco) VALUES ('Tapioca com Queijo', 'Tapioca com recheio de queijo coalho', 10.00);
