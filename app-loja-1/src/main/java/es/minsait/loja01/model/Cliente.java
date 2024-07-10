@@ -1,4 +1,4 @@
-package es.minsait.gom.model;
+package es.minsait.loja01.model;
 
 
 public class Cliente{

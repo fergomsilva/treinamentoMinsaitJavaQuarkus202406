@@ -16,3 +16,25 @@
 --INSERT INTO itens_cardapio (nome, descricao, preco) VALUES ('Açaí na Tigela', 'Açaí servido na tigela com granola e banana', 14.00);
 --INSERT INTO itens_cardapio (nome, descricao, preco) VALUES ('Pão de Queijo', 'Delicioso pão de queijo mineiro', 3.50);
 --INSERT INTO itens_cardapio (nome, descricao, preco) VALUES ('Tapioca com Queijo', 'Tapioca com recheio de queijo coalho', 10.00);
+
+--LOJA 2
+--INSERT INTO itens_cardapio (nome, descricao, preco) VALUES ('Coxinha', 'Deliciosa coxinha de frango', 3.5);
+--INSERT INTO itens_cardapio (nome, descricao, preco) VALUES ('Pastel', 'Pastel frito na hora', 2.5);
+--INSERT INTO itens_cardapio (nome, descricao, preco) VALUES ('Caldo de Feijão', 'Saboroso caldo de feijão', 10.0);
+--INSERT INTO itens_cardapio (nome, descricao, preco) VALUES ('Picanha', 'Picanha suculenta com fritas', 25.0);
+--INSERT INTO itens_cardapio (nome, descricao, preco) VALUES ('Frango à Passarinho', 'Frango à passarinho crocante', 15.0);
+--INSERT INTO itens_cardapio (nome, descricao, preco) VALUES ('Bolinho de Bacalhau', 'Tradicional bolinho de bacalhau', 4.0);
+--INSERT INTO itens_cardapio (nome, descricao, preco) VALUES ('Mandioca Frita', 'Porção de mandioca frita', 10.0);
+--INSERT INTO itens_cardapio (nome, descricao, preco) VALUES ('Feijoada', 'Feijoada completa servida com arroz e farofa', 30.0);
+--INSERT INTO itens_cardapio (nome, descricao, preco) VALUES ('Moqueca de Peixe', 'Moqueca de peixe com pirão', 35.0);
+--INSERT INTO itens_cardapio (nome, descricao, preco) VALUES ('Escondidinho de Carne', 'Escondidinho de carne com purê de mandioca', 20.0);
+--INSERT INTO itens_cardapio (nome, descricao, preco) VALUES ('Torta de Limão', 'Deliciosa torta de limão', 6.0);
+--INSERT INTO itens_cardapio (nome, descricao, preco) VALUES ('Brigadeiro', 'Docinho de brigadeiro', 1.5);
+--INSERT INTO itens_cardapio (nome, descricao, preco) VALUES ('Caipirinha', 'Caipirinha de limão', 8.0);
+--INSERT INTO itens_cardapio (nome, descricao, preco) VALUES ('Cerveja', 'Cerveja gelada', 5.0);
+--INSERT INTO itens_cardapio (nome, descricao, preco) VALUES ('Batata Frita', 'Porção de batata frita', 10.0);
+--INSERT INTO itens_cardapio (nome, descricao, preco) VALUES ('Pão de Alho', 'Pão de alho para acompanhar o churrasco', 4.0);
+--INSERT INTO itens_cardapio (nome, descricao, preco) VALUES ('Churrasco Misto', 'Churrasco misto com carnes e linguiça', 30.0);
+--INSERT INTO itens_cardapio (nome, descricao, preco) VALUES ('Acarajé', 'Tradicional acarajé baiano', 12.0);
+--INSERT INTO itens_cardapio (nome, descricao, preco) VALUES ('Bobó de Camarão', 'Bobó de camarão servido com arroz', 40.0);
+--INSERT INTO itens_cardapio (nome, descricao, preco) VALUES ('Mousse de Maracujá', 'Mousse de maracujá para sobremesa', 6.0);

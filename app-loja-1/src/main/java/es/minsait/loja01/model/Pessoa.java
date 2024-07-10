@@ -1,5 +1,6 @@
-package es.minsait.gom.model;
+package es.minsait.loja01.model;
 
+import es.minsait.loja01.enums.TipoDocumentoEnum;
 
 public class Pessoa{
 

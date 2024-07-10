@@ -1,7 +1,9 @@
-package es.minsait.gom.model;
+package es.minsait.loja01.model;
 
 import java.time.LocalDate;
 import java.util.List;
+
+import es.minsait.loja01.enums.StatusPedidoEnum;
 
 
 public class Pedido{

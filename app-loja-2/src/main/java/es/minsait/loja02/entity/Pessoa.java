@@ -1,6 +1,6 @@
-package es.minsait.gom.model;
+package es.minsait.loja02.entity;
 
-import es.minsait.gom.enums.TipoDocumentoEnum;
+import es.minsait.loja02.enums.TipoDocumentoEnum;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

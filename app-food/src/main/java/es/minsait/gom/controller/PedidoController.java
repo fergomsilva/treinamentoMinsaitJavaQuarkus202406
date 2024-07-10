@@ -5,6 +5,7 @@ import static es.minsait.gom.util.Constantes.HTTP_STATUS_OK;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 
 import org.eclipse.microprofile.reactive.messaging.Incoming;
@@ -15,12 +16,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import es.minsait.gom.enums.StatusPedidoEnum;
 import es.minsait.gom.json.LocalDateJsonAdapter;
 import es.minsait.gom.json.PedidoResponse;
 import es.minsait.gom.model.Cliente;
 import es.minsait.gom.model.Loja;
 import es.minsait.gom.model.Pedido;
-import es.minsait.gom.model.StatusPedidoEnum;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -183,7 +184,8 @@ public class PedidoController{
     }
 
     private void gerarUuidPedido(Pedido pedido) {
-        final StringBuilder buffer = new StringBuilder( pedido.getLoja().getNome() )
+        final StringBuilder buffer = new StringBuilder( String.valueOf( new Random().nextLong() ) )
+            .append( pedido.getLoja().getNome() )
             .append( pedido.getLoja().getUrlApi() )
 
             .append( pedido.getCliente().getPessoa().getId() )

@@ -1,4 +1,4 @@
-package es.minsait.gom.json;
+package es.minsait.loja01.json;
 
 import java.lang.reflect.Type;
 import java.time.LocalDate;

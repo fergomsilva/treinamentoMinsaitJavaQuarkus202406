@@ -1,4 +1,4 @@
-package es.minsait.gom;
+package es.minsait.loja01;
 
 import java.time.LocalDate;
 
@@ -7,8 +7,8 @@ import org.slf4j.Logger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import es.minsait.gom.json.LocalDateJsonAdapter;
-import es.minsait.gom.model.Pedido;
+import es.minsait.loja01.json.LocalDateJsonAdapter;
+import es.minsait.loja01.model.Pedido;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;

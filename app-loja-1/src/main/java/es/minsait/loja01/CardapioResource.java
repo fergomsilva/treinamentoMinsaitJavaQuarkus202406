@@ -1,11 +1,11 @@
-package es.minsait.gom;
+package es.minsait.loja01;
 
 import java.util.Arrays;
 import java.util.List;
 
 import org.slf4j.Logger;
 
-import es.minsait.gom.dto.ItemCardapioDTO;
+import es.minsait.loja01.dto.ItemCardapioDTO;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;

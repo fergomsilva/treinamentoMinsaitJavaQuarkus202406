@@ -1,9 +1,8 @@
-package es.minsait.gom.model;
+package es.minsait.loja02.enums;
 
 public enum StatusPedidoEnum{
-    ENVIANDO( "Enviando Dados do Pedido para a Loja" ), 
-    ERRO_ENVIO( "Erro no Envio dos Dados para a Loja" ), 
     ENVIADO( "Enviado" ), 
+    RECEBIDO( "Recebido" ), 
     AGUARDANDO_CONFIRMACAO( "Aguardando Confirmação" ), 
     CONFIRMADO( "Confirmado" ), 
     EM_PREPARACAO( "Em Preparação" ),
