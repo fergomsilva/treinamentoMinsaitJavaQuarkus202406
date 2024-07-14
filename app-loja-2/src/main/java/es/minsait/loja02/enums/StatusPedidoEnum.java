@@ -1,6 +1,7 @@
 package es.minsait.loja02.enums;
 
 public enum StatusPedidoEnum{
+    ENVIANDO( "Enviando Dados do Pedido para a Loja" ), 
     ENVIADO( "Enviado" ), 
     RECEBIDO( "Recebido" ), 
     AGUARDANDO_CONFIRMACAO( "Aguardando Confirmação" ), 

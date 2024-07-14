@@ -1,5 +1,7 @@
 package es.minsait.loja02.entity;
 
+import java.util.Optional;
+
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToOne;
@@ -22,6 +24,10 @@ public class Cliente extends PanacheEntity{
         this.setPessoa( pessoa );
     }
 
+    public Cliente copySemIds(){
+        return new Cliente( this.getEmail(), this.getPessoa().copySemIds() );
+    }
+
     public String getEmail() {
         return email;
     }
@@ -34,6 +40,14 @@ public class Cliente extends PanacheEntity{
     }
     public void setPessoa(Pessoa pessoa) {
         this.pessoa = pessoa;
+    }
+
+
+
+    public static Optional<Cliente> findByEmail(final String email){
+        return Cliente.find( "from Cliente c where c.email=?1", email )
+            .page( 0, 1 )
+            .singleResultOptional();
     }
 
 }

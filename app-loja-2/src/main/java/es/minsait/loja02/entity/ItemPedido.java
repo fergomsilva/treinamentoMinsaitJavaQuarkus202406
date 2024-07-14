@@ -7,6 +7,7 @@ import jakarta.persistence.ManyToOne;
 @Entity
 public class ItemPedido extends PanacheEntity{
     
+    private Long idItemLoja;
     private String nome;
     private Integer quantidade;
     private Double preco;
@@ -17,11 +18,25 @@ public class ItemPedido extends PanacheEntity{
         super();
     }
 
-    public ItemPedido(String nome, Integer quantidade, Double preco, Pedido pedido) {
+    public ItemPedido(Long idItemLoja, String nome, Integer quantidade, Double preco, Pedido pedido) {
+        this.idItemLoja = idItemLoja;
         this.nome = nome;
         this.quantidade = quantidade;
         this.preco = preco;
         this.pedido = pedido;
+    }
+
+    public ItemPedido copySemIds(){
+        return new ItemPedido( this.getIdItemLoja(), this.getNome(), 
+            this.getQuantidade(), this.getPreco(), null );
+    }
+
+    public Long getIdItemLoja() {
+        return idItemLoja;
+    }
+
+    public void setIdItemLoja(Long idItemLoja) {
+        this.idItemLoja = idItemLoja;
     }
 
     public String getNome() {

@@ -13,5 +13,6 @@ INSERT INTO pessoa (id, nome, endereco, cidade, uf, tipoDocumento, documento) VA
 INSERT INTO cliente (id, pessoa_id, email) VALUES (nextval('cliente_seq'), currval('pessoa_seq'), 'contato@empresaabc.com');
 INSERT INTO pessoa (id, nome, endereco, cidade, uf, tipoDocumento, documento) VALUES (nextval('pessoa_seq'), 'Pedro Oliveira', 'Av. das Árvores, 101', 'Porto Alegre', 'RS', 0, '11122233344');
 INSERT INTO cliente (id, pessoa_id, email) VALUES (nextval('cliente_seq'), currval('pessoa_seq'), 'pedro@email.com');
-INSERT INTO loja (id, nome, endereco, urlApi) VALUES (nextval('loja_seq'), 'Food 1', 'Avenida Comercial, 123', 'http:/localhost:9091/');
-INSERT INTO loja (id, nome, endereco, urlApi) VALUES (nextval('loja_seq'), 'Food 2', 'Rua dos Botecos, 987', 'http:/localhost:9092/');
+INSERT INTO loja (id, nome, endereco, tipoAcesso, urlApi) VALUES (nextval('loja_seq'), 'Food 1', 'Avenida Comercial, 123', 0, 'http://localhost:9091/');
+--INSERT INTO loja (id, nome, endereco, tipoAcesso, urlApi) VALUES (nextval('loja_seq'), 'Food 2', 'Rua dos Botecos, 987', 0, 'http://localhost:9092/');
+INSERT INTO loja (id, nome, endereco, tipoAcesso, urlApi) VALUES (nextval('loja_seq'), 'Food 2', 'Rua dos Botecos, 987', 1, 'http://localhost:9092/');

@@ -14,7 +14,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 
-@Path( "menu" )
+@Path( "cardapio" )
 @Produces( MediaType.APPLICATION_JSON )
 @Consumes( MediaType.APPLICATION_JSON )
 public class MenuResource{
@@ -26,7 +26,7 @@ public class MenuResource{
         final List<ItemMenuVO> menu = ItemMenu.listAll().stream()
             .map( entity ->{
                 final ItemMenu item = (ItemMenu)entity;
-                return new ItemMenuVO( item.getNome(), item.getDescricao(), item.getPreco() );
+                return new ItemMenuVO( item.id, item.getNome(), item.getDescricao(), item.getPreco() );
             } ).toList();
         LOG.info( String.format( "Menu solicitado: \n%s", menu ) );
         return Response.ok( menu ).build();

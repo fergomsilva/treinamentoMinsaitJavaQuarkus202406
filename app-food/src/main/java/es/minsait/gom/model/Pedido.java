@@ -11,7 +11,6 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.transaction.Transactional;
 
 
 @Entity
@@ -34,11 +33,11 @@ public class Pedido extends PanacheEntity{
     }
 
     public static Optional<Pedido> findByUUID(final String uuid){
-        final List<Pedido> lista = Pedido.list( "from Pedido p where p.uuid=?1", uuid );
-        return lista.isEmpty() ? Optional.empty() : Optional.of( lista.get( 0 ) );
+        return Pedido.find( "from Pedido p where p.uuid=?1", uuid )
+            .page( 0, 1 )
+            .singleResultOptional();
     }
 
-    @Transactional
     public static void updateStatus(final String uuid, final StatusPedidoEnum novoStatus){
         final Optional<Pedido> pedido = Pedido.findByUUID( uuid );
         if( pedido.isPresent() ){

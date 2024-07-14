@@ -2,6 +2,7 @@ package es.minsait.loja02.entity;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import es.minsait.loja02.enums.StatusPedidoEnum;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
@@ -36,6 +37,20 @@ public class Pedido extends PanacheEntity{
         this.descricao = descricao;
         this.itensPedido = itensPedido;
         this.status = status;
+    }
+
+    public Pedido copySemIds(){
+        return new Pedido( this.getUuid(), this.getCliente().copySemIds(), 
+            this.getDataPedido(), this.getDescricao(), 
+            this.getItensPedido().stream()
+                .map( ItemPedido::copySemIds ).toList(), 
+            this.getStatus() );
+    }
+
+    public static Optional<Pedido> findByUUID(final String uuid){
+        return Pedido.find( "from Pedido p where p.uuid=?1", uuid )
+            .page( 0, 1 )
+            .singleResultOptional();
     }
 
     public String getUuid() {

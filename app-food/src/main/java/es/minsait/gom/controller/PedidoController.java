@@ -8,7 +8,9 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
+import org.eclipse.microprofile.reactive.messaging.Acknowledgment;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
+import org.eclipse.microprofile.reactive.messaging.Acknowledgment.Strategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,9 +21,12 @@ import com.google.gson.GsonBuilder;
 import es.minsait.gom.enums.StatusPedidoEnum;
 import es.minsait.gom.json.LocalDateJsonAdapter;
 import es.minsait.gom.json.PedidoResponse;
+import es.minsait.gom.json.PedidoStatusResponse;
 import es.minsait.gom.model.Cliente;
 import es.minsait.gom.model.Loja;
 import es.minsait.gom.model.Pedido;
+import io.smallrye.reactive.messaging.annotations.Blocking;
+import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -63,6 +68,7 @@ public class PedidoController{
     }
 
     @POST
+    @Transactional
     public Response create(final Pedido pedido){
         try{
             final String msgValidacao = this.validarDadosPedido( pedido );
@@ -83,17 +89,21 @@ public class PedidoController{
             final Response pedidoResp = client.target( pedido.getLoja().getUrlApi() + "pedido" )
                 .request( MediaType.APPLICATION_JSON )
                 .post( Entity.entity( jsonPedido, MediaType.APPLICATION_JSON ) );
+            pedido.setStatus( StatusPedidoEnum.ENVIANDO );
+            pedido.persist();
 
             //testar se a requisoao retorno OK (200 201)
-            if( !HTTP_STATUS_OK.contains( pedidoResp.getStatus() ) ){
+            if( !HTTP_STATUS_OK.contains( pedidoResp.getStatus() ) && ( StatusPedidoEnum.RECEBIDO != ( (Pedido)pedidoResp.getEntity() ).getStatus() ) ){
                 LOG.error( String.format( "Erro ao criar pedido na loja: '%s', URL: '%s', StatusCode: %d", 
                     pedido.getLoja().getNome(), pedido.getLoja().getUrlApi(), pedidoResp.getStatus() ) );
                 pedido.setStatus( StatusPedidoEnum.ERRO_ENVIO );
+                pedido.persist();
                 return Response.status( Response.Status.BAD_REQUEST )
                     .entity( "Erro ao criar pedido na loja" ).build();
             }else{
                 LOG.error( " >>> Passou!" );
-                ( (Pedido)pedidoResp.getEntity() ).setStatus( StatusPedidoEnum.ENVIADO );
+                pedido.setStatus( StatusPedidoEnum.ENVIADO );
+                pedido.persist();
                 return pedidoResp;
             }
         }catch( Exception e ){
@@ -203,7 +213,7 @@ public class PedidoController{
                     ( item.getPreco() != null ? item.getPreco().toString() : "0.0" ) ) )
                 .toList() )
         );
-        pedido.setUuid( UUID.fromString( buffer.toString() ).toString() );
+        pedido.setUuid( UUID.nameUUIDFromBytes( buffer.toString().getBytes() ).toString() );
     }
 
     @Incoming( "pedido-responses" )
@@ -219,6 +229,34 @@ public class PedidoController{
             }
         }catch( Exception e ){
             LOG.error( "Erro ao processar fila de pedido", e );
+        }
+    }
+
+    @Transactional
+    @Incoming( "pedido-status-response" )
+    @Blocking( ordered=false, value="pedido-status-loja-response" )
+    //@Acknowledgment( Strategy.NONE )
+    public void handlerStatusPedido(final String message){
+        String json = new String( message );
+        try{
+            final ObjectMapper mapper = new ObjectMapper();
+            final PedidoStatusResponse pedidoStatusResponse = mapper.readValue( 
+                json, PedidoStatusResponse.class );
+            if( pedidoStatusResponse.getStatus() != null ){
+                if( StatusPedidoEnum.RECEBIDO != pedidoStatusResponse.getStatus() ){
+                    Pedido.updateStatus( pedidoStatusResponse.getUuidPedido(), pedidoStatusResponse.getStatus() );
+                    LOG.info( String.format( "Novo status do Pedido '%s': '%s'", 
+                        pedidoStatusResponse.getUuidPedido(), pedidoStatusResponse.getStatus() ) );
+                }else{
+                    Pedido.updateStatus( pedidoStatusResponse.getUuidPedido(), StatusPedidoEnum.AGUARDANDO_CONFIRMACAO );
+                    LOG.info( String.format( "Novo status do Pedido foi 'RECEBIDO' alterado para '%s': '%s'", 
+                        pedidoStatusResponse.getUuidPedido(), StatusPedidoEnum.AGUARDANDO_CONFIRMACAO ) );
+                }
+            }else
+                LOG.error( String.format( "Erro da consulta do Pedido '%s': '%s'", 
+                    pedidoStatusResponse.getUuidPedido(), pedidoStatusResponse.getMensagemErro() ) );
+        }catch( Exception e ){
+            LOG.error( "Erro ao processar fila 'pedido-status-responses'.", e );
         }
     }
 

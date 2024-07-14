@@ -43,6 +43,11 @@ public class Pessoa extends PanacheEntity{
         this.documento = documento;
     }
 
+    public Pessoa copySemIds(){
+        return new Pessoa( null, this.getNome(), this.getEndereco(), this.getCidade(), 
+            this.getUf(), this.getTipoDocumento(), this.getDocumento() );
+    }
+
     public Long getId() {
         return id;
     }

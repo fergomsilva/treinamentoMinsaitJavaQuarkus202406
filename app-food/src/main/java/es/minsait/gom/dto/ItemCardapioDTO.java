@@ -1,4 +1,4 @@
 package es.minsait.gom.dto;
 
-public record ItemCardapioDTO(String nome, String descricao, Double preco){
+public record ItemCardapioDTO(Long id, String nome, String descricao, Double preco){
 }
