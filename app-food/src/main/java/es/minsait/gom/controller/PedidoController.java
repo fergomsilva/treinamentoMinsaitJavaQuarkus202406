@@ -8,9 +8,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
-import org.eclipse.microprofile.reactive.messaging.Acknowledgment;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
-import org.eclipse.microprofile.reactive.messaging.Acknowledgment.Strategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,13 +17,13 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import es.minsait.gom.enums.StatusPedidoEnum;
+import es.minsait.gom.enums.TIPO_ACESSO_LOJA_ENUM;
 import es.minsait.gom.json.LocalDateJsonAdapter;
 import es.minsait.gom.json.PedidoResponse;
-import es.minsait.gom.json.PedidoStatusResponse;
 import es.minsait.gom.model.Cliente;
 import es.minsait.gom.model.Loja;
 import es.minsait.gom.model.Pedido;
-import io.smallrye.reactive.messaging.annotations.Blocking;
+import es.minsait.gom.queue.EnviarPedidoQueue;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -50,6 +48,7 @@ public class PedidoController{
         .registerTypeAdapter( LocalDate.class, new LocalDateJsonAdapter() )
         .create();
     private static final Logger LOG = LoggerFactory.getLogger( PedidoController.class );
+
 
     @GET
     @Path( "/{idLoja}" )
@@ -81,35 +80,54 @@ public class PedidoController{
             pedido.setStatus( StatusPedidoEnum.ENVIANDO );
             this.gerarUuidPedido( pedido );
 
-            final Client client = ClientBuilder.newClient();
-            final String jsonPedido = GSON.toJson( pedido );
-            LOG.info( String.format( " >>>>>>>>>>> Pedido a ser realizado: \n%s", jsonPedido ) );
-
             //enviar o pedido para a url da loja
-            final Response pedidoResp = client.target( pedido.getLoja().getUrlApi() + "pedido" )
-                .request( MediaType.APPLICATION_JSON )
-                .post( Entity.entity( jsonPedido, MediaType.APPLICATION_JSON ) );
-            pedido.setStatus( StatusPedidoEnum.ENVIANDO );
-            pedido.persist();
-
-            //testar se a requisoao retorno OK (200 201)
-            if( !HTTP_STATUS_OK.contains( pedidoResp.getStatus() ) && ( StatusPedidoEnum.RECEBIDO != ( (Pedido)pedidoResp.getEntity() ).getStatus() ) ){
-                LOG.error( String.format( "Erro ao criar pedido na loja: '%s', URL: '%s', StatusCode: %d", 
-                    pedido.getLoja().getNome(), pedido.getLoja().getUrlApi(), pedidoResp.getStatus() ) );
-                pedido.setStatus( StatusPedidoEnum.ERRO_ENVIO );
-                pedido.persist();
-                return Response.status( Response.Status.BAD_REQUEST )
-                    .entity( "Erro ao criar pedido na loja" ).build();
-            }else{
-                LOG.error( " >>> Passou!" );
-                pedido.setStatus( StatusPedidoEnum.ENVIADO );
-                pedido.persist();
-                return pedidoResp;
-            }
+            if( TIPO_ACESSO_LOJA_ENUM.REST == pedido.getLoja().getTipoAcesso() )
+                return this.enviarPedidoPorRest( pedido );
+            return this.enviarPedidoPorQueue( pedido );
         }catch( Exception e ){
             LOG.error( "Erro ao criar pedido", e );
             return Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
         }
+    }
+
+    private Response enviarPedidoPorRest(final Pedido pedido){
+        final String jsonPedido = GSON.toJson( pedido );
+        LOG.info( String.format( " >>>>>>>>>>> Pedido a ser realizado por REST: \n%s", 
+            jsonPedido ) );
+        
+        final Client client = ClientBuilder.newClient();
+        final Response pedidoResp = client.target( pedido.getLoja().getUrlApi() + "pedido" )
+            .request( MediaType.APPLICATION_JSON )
+            .post( Entity.entity( jsonPedido, MediaType.APPLICATION_JSON ) );
+        pedido.setStatus( StatusPedidoEnum.ENVIANDO );
+        pedido.persist();
+
+        //testar se a requisoao retorno OK (200 201)
+        if( !HTTP_STATUS_OK.contains( pedidoResp.getStatus() ) && ( StatusPedidoEnum.RECEBIDO != ( (Pedido)pedidoResp.getEntity() ).getStatus() ) ){
+            LOG.error( String.format( "Erro ao criar pedido na loja: '%s', URL: '%s', StatusCode: %d", 
+                pedido.getLoja().getNome(), pedido.getLoja().getUrlApi(), pedidoResp.getStatus() ) );
+            pedido.setStatus( StatusPedidoEnum.ERRO_ENVIO );
+            pedido.persist();
+            return Response.status( Response.Status.BAD_REQUEST )
+                .entity( "Erro ao criar pedido na loja" ).build();
+        }else{
+            LOG.error( " >>> Passou!" );
+            pedido.setStatus( StatusPedidoEnum.ENVIADO );
+            pedido.persist();
+            return pedidoResp;
+        }
+    }
+
+    private Response enviarPedidoPorQueue(final Pedido pedido){
+        final String jsonPedido = GSON.toJson( pedido );
+        LOG.info( String.format( " >>>>>>>>>>> Pedido a ser realizado por Queue: \n%s", 
+            jsonPedido ) );
+        
+        new EnviarPedidoQueue( pedido ).send();
+        
+        pedido.setStatus( StatusPedidoEnum.ENVIANDO );
+        pedido.persist();
+        return Response.ok( pedido ).build();
     }
 
     private String validarDadosPedido(final Pedido pedido){
@@ -178,7 +196,8 @@ public class PedidoController{
         }else{
             final Optional<Loja> l = Loja.findByIdOptional( pedido.getLoja().id );
             if( l.isPresent() ){
-                if( l.get().getUrlApi() == null || l.get().getUrlApi().strip().isEmpty() ){
+                if( l.get().getTipoAcesso() == null || ( l.get().getTipoAcesso() == TIPO_ACESSO_LOJA_ENUM.REST 
+                        && ( l.get().getUrlApi() == null || l.get().getUrlApi().strip().isEmpty() ) ) ){
                     if( erros.length() > 0 )
                         erros.append( System.lineSeparator() );
                     erros.append( String.format( "Cadastro da loja '%s' incompleto.", 
@@ -232,10 +251,9 @@ public class PedidoController{
         }
     }
 
+    /*
     @Transactional
-    @Incoming( "pedido-status-response" )
-    @Blocking( ordered=false, value="pedido-status-loja-response" )
-    //@Acknowledgment( Strategy.NONE )
+    @Incoming( "pedido-status-loja-response" )
     public void handlerStatusPedido(final String message){
         String json = new String( message );
         try{
@@ -256,8 +274,9 @@ public class PedidoController{
                 LOG.error( String.format( "Erro da consulta do Pedido '%s': '%s'", 
                     pedidoStatusResponse.getUuidPedido(), pedidoStatusResponse.getMensagemErro() ) );
         }catch( Exception e ){
-            LOG.error( "Erro ao processar fila 'pedido-status-responses'.", e );
+            LOG.error( "Erro ao processar fila 'pedido-status-loja-response'.", e );
         }
     }
+    */
 
 }

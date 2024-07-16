@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 import org.eclipse.microprofile.reactive.messaging.Incoming;
-import org.eclipse.microprofile.reactive.messaging.Outgoing;
 import org.slf4j.Logger;
 
 import com.google.gson.Gson;
@@ -15,13 +14,10 @@ import es.minsait.loja02.entity.Pedido;
 import es.minsait.loja02.entity.Pessoa;
 import es.minsait.loja02.enums.StatusPedidoEnum;
 import es.minsait.loja02.json.LocalDateJsonAdapter;
-import es.minsait.loja02.json.PedidoStatusResponse;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -41,7 +37,7 @@ public class PedidoResource{
     
     @POST
     @Transactional
-    public Response createPedido(Pedido pedido){
+    public Response createPedidoPorRest(Pedido pedido){
         try{
             LOG.info( String.format( "Pedido recebido:\n%s", GSON.toJson( pedido ) ) );
             if( pedido.getCliente() != null ){
@@ -57,7 +53,8 @@ public class PedidoResource{
             }
             pedido.setStatus( StatusPedidoEnum.RECEBIDO );
             pedido.persist();
-            this.launchQueue( pedido.getUuid() );
+            //this.launchQueue( pedido.getUuid() );
+            LOG.info( String.format( " >>>>>>>> PEDIDO SALVO ", GSON.toJson( pedido ) ) );
             return Response.ok( pedido.copySemIds() ).build();
         }catch( Exception e ){
             LOG.error( e.getLocalizedMessage(), e );
@@ -65,6 +62,17 @@ public class PedidoResource{
         }
     }
 
+    @Incoming( "pedido-request" )
+    public void createPedidoPorQueue(final byte[] message){
+        if( message != null && message.length > 0 ){
+            final String json = new String( message );
+            System.out.printf( " PEDIDO RECEBIDO ", json ).println();
+            final Pedido pedido = GSON.fromJson( json, Pedido.class );
+            this.createPedidoPorRest( pedido );
+        }
+    }
+
+    /*
     @PUT
     @Path( "/{idPedido}/{novoStatus}" )
     @Transactional
@@ -99,6 +107,7 @@ public class PedidoResource{
         t.start();
     }
 
+    
     @Transactional
     @Incoming("pedido-status-loja-request")
     @Outgoing("pedido-status-loja-response")
@@ -119,11 +128,10 @@ public class PedidoResource{
             response.setMensagemErro( String.format( "Erro ocorrido na busca pelo pedido '%s': %s", 
                 uuid, e.getLocalizedMessage() ) );
         }
-        //final PedidoStatusLojaResponseQueue queue = new PedidoStatusLojaResponseQueue( response );
-        //queue.handlerStatusPedido();
         final String json = GSON.toJson( response );
         LOG.info( String.format( "Enviando dados para o 'app-food' %s", json ) );
         return json;
     }
+    */
 
 }
